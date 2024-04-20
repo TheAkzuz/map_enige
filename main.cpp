@@ -23,6 +23,10 @@ int map_num = 0;
 int scrol_x = 1;// коррды для скролинга, а имено добавление
 int scrol_y = 1;
 
+int scrol_x_mas=0;
+int scrol_y_mas = 0;
+
+
 int win_x = 1200; //window mode
 int win_y = 600;
 
@@ -75,6 +79,12 @@ public:
 
 	}
 
+	void return_size_image()
+	{
+		Vector2u image_size = image.getSize();
+		
+	}
+
 
 	
 
@@ -85,15 +95,19 @@ public:
 
 
 
+
+
+
+
 void crea_setka()
 {
 	for (int a = 0; a < 9; a++)
 	{
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < map_y; i++)
 		{
 
-			map_vid[a][i] = string(32, '0');
-			map_script[i] = string(32, '0');
+			map_vid[a][i] = string(map_x, '0');
+			map_script[i] = string(map_x, '0');
 
 
 		}
@@ -103,10 +117,14 @@ void crea_setka()
 void save_fun()
 {
 	ofstream save_fu(save_file+".txt");
+	save_fu << map_x << endl;
+	save_fu << map_y << endl;
+	save_fu << map_z << endl;
 
-	for (int a = 0; a < 9; a++)
+
+	for (int a = 0; a < map_z; a++)
 	{
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < map_y; i++)
 		{
 			save_fu << map_vid[a][i] << endl;
 		}
@@ -119,7 +137,7 @@ void save_fun()
 	}
 
 
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < map_y; i++)
 	{
 		save_fu << map_script[i] << endl;
 	}
@@ -157,6 +175,30 @@ void map_to_script()
 }
 
 
+void set_size_map()
+{
+	map_vid.resize(map_z, vector<string>(map_y));
+
+	map_script.resize(map_y);
+
+//	string lol = string(map_x, '0');
+	//for (int a = 0; a < 9; a++)
+	//{
+	//	for (int i = 0; i < map_y; i++)
+	//	{
+
+		//	map_vid[a][i] = lol;
+		//	map_script[i] = lol;
+
+
+	//	}
+//	}
+
+	
+
+	
+}
+
 
 
 void load_save()
@@ -164,11 +206,19 @@ void load_save()
 
 	fstream load_file(save_file+".txt");
 
-	for (int a = 0; a < 9; a++)
+	load_file >> map_x;
+	load_file >> map_y;
+	load_file >> map_z;
+
+	map_vid.resize(map_z, vector<string>(map_y));
+	map_script.resize(map_y);
+
+	for (int a = 0; a < map_z; a++)
 	{
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < map_y; i++)
 		{
 			load_file >> map_vid[a][i];
+			//cout << map_vid[a][i] << endl;
 		}
 
 		for (int i = 0; i < 10; i++)
@@ -179,7 +229,7 @@ void load_save()
 	}
 
 
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < map_y; i++)
 	{
 		load_file >> map_script[i];
 	}
@@ -223,7 +273,7 @@ int main()
 	window.setFramerateLimit(20);
 	crea_setka();
 
-	for (int a = 0; a < 9; a++)
+	for (int a = 0; a < map_z; a++)
 	{
 		for (int i = 0; i < 10; i++)
 		{
@@ -244,7 +294,7 @@ int main()
 
 
 	Texturs console_von("console_vid");
-	console_von.position(win_x - 130, 0);
+	console_von.position(win_x - 600, 0);
 
 	Texturs save_von("red_tt");
 	save_von.position(win_x - 130, 70);
@@ -262,6 +312,13 @@ int main()
 
 	Texturs script_load("script_map");
 	script_load.position(win_x - 130,save_f.y+26);
+
+	Texturs set_y("set_y");
+	set_y.position(win_x - 320, 73);
+
+	Texturs set_x("set_x");
+	set_x.position(win_x - 520, 73);
+
 
 
 	//////////////////////////////// poka open window
@@ -293,7 +350,7 @@ int main()
 
 			}
 
-			if (event.type == Event::MouseButtonPressed && Mouse::isButtonPressed(Mouse::Left) && win_mode >= 2 && win_mode <= 11 && mouse_pos.x < 16 * 32 && mouse_pos.y < 16 * 32)
+			if (event.type == Event::MouseButtonPressed && Mouse::isButtonPressed(Mouse::Left) && win_mode >= 2 && win_mode <= 11 && mouse_pos.x < map_x * 32 && mouse_pos.y < map_y * 32)
 			{
 
 				int mouse_x_c = 0;
@@ -315,12 +372,12 @@ int main()
 				if (mode_map ==0)
 				{
 				
-				map_vid[map_num][mouse_x_c - 1 + (16 * (scrol_x - 1))][mouse_y_c - 1 + (16 * (scrol_y - 1))]        = simvol_map[0];
+				map_vid[map_num][mouse_y_c - 1 + scrol_y_mas][mouse_x_c - 1 + scrol_x_mas]        = simvol_map[0];
 				}
 				if (mode_map == 1)
 				{
 
-					map_script[mouse_x_c - 1 + (16 * (scrol_x - 1))][mouse_y_c - 1 + (16 * (scrol_y - 1))] = simvol_map[0];
+				//	map_script[mouse_x_c - 1 + (16 * (scrol_x - 1))][mouse_y_c - 1 + (16 * (scrol_y - 1))] = simvol_map[0];
 				}
 				//cout << mouse_x_c - 1 <<" "<< mouse_y_c - 1 << " "<< map_vid[mouse_x_c - 1][mouse_y_c - 1] << endl;
 
@@ -329,28 +386,32 @@ int main()
 
 			if (event.type == Event::KeyPressed)
 			{
-				if (Keyboard::isKeyPressed(Keyboard::Up) )
+				if (Keyboard::isKeyPressed(Keyboard::Up) && scrol_y>1 )
 				{
-					scrol_y = 1;
+					scrol_y --;
 					cout << scrol_y << endl;
 				}
 
-				if (Keyboard::isKeyPressed(Keyboard::Down))
+				if (Keyboard::isKeyPressed(Keyboard::Down) && scrol_y<map_y-15)
 				{
-					scrol_y = 2;
+					scrol_y ++;
 					cout << scrol_y << endl;
 				}
-				if (Keyboard::isKeyPressed(Keyboard::Left))
+				if (Keyboard::isKeyPressed(Keyboard::Left) && scrol_x>1)
 				{
-					scrol_x = 1;
+					scrol_x --;
 					cout << scrol_x << endl;
 				}
 
-				if (Keyboard::isKeyPressed(Keyboard::Right))
+				if (Keyboard::isKeyPressed(Keyboard::Right)&& scrol_x< map_x-15)
 				{
-					scrol_x = 2;
+					scrol_x ++;
 					cout << scrol_x << endl;
 				}
+
+
+				scrol_x_mas= (scrol_x-1);
+				scrol_y_mas= (scrol_y - 1) ;
 			}
 
 
@@ -419,6 +480,33 @@ int main()
 			Sleep(50);
 
 		}
+
+
+
+
+		if (Mouse::isButtonPressed(Mouse::Left) && (mouse_x >set_x.x && mouse_x < set_x.x + 114) && (mouse_y > set_x.y && mouse_y < set_x.y + 24))
+		{
+			
+			log_info = "set x";
+			map_x = stoi( save_file);
+			crea_setka();
+		
+		}
+
+		if (Mouse::isButtonPressed(Mouse::Left) && (mouse_x > set_y.x && mouse_x < set_y.x + 114) && (mouse_y > set_y.y && mouse_y < set_y.y + 24))
+		{
+			
+			log_info = "set y";
+			map_y = stoi(save_file);
+			set_size_map();
+
+		}
+
+
+
+
+
+
 		if (win_mode != 1)
 		{
 			if (Keyboard::isKeyPressed(Keyboard::Num0))
@@ -489,6 +577,8 @@ int main()
 		window.draw(create_setka.sprite);
 		window.draw(save_f.sprite);
 		window.draw(script_load.sprite);
+		window.draw(set_y.sprite);
+		window.draw(set_x.sprite);
 
 
 		for (int i = 0; i < 10; i++)
@@ -537,17 +627,17 @@ int main()
 		if (otris_map == 1)
 		{
 
-			for (int i = 0; i < map_y/2; i++)
+			for (int i = 0; i <16 && i<=map_x; i++)
 			{
-				for (int a = 0; a<map_x/2; a++)
+				for (int a = 0; a<16 && a <= map_y; a++)
 				{		
 					if (mode_map == 0)
 					{
-						st.name = names_st_map[map_num][(int)map_vid[map_num][i + (16 * (scrol_x - 1))][a + (16 * (scrol_y - 1))] - 48];
+						st.name = names_st_map[map_num][(int)map_vid[map_num]  [a + scrol_y_mas]   [i + scrol_x_mas] - 48];
 					}
 					if (mode_map == 1)
 					{
-						st.name = names_script_map[(int)map_script[i + (16 * (scrol_x - 1))][a + (16 * (scrol_y - 1))] - 48];
+						st.name = names_script_map[(int)map_script[a + scrol_y_mas][i + scrol_x_mas] - 48];
 					}
 						st.otris();
 
@@ -577,6 +667,14 @@ int main()
 
 		text.setPosition(win_x - 120, 53);
 		text.setString("map #:" + to_string(map_num));
+		window.draw(text);
+
+		text.setPosition(win_x - 320, 53);
+		text.setString("Y count:" + to_string(map_y));
+		window.draw(text);
+
+		text.setPosition(win_x - 520, 53);
+		text.setString("X count:" + to_string(map_x));
 		window.draw(text);
 
 		text.setPosition(win_x - 120, 1);
