@@ -16,5 +16,6 @@
 
 	vector<vector<string>> map_vid(map_z,vector<string>(map_y));
 	vector<string> map_script(map_y);
+	vector<vector<string>> info_map_script(map_y,vector<string>(map_x));
 	//string  map_vid[9][map_y] = {};
 	//string  map_script[map_y] = {};

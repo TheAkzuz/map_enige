@@ -31,8 +31,10 @@ int win_x = 1200; //window mode
 int win_y = 600;
 
 int win_mode = 0; // active type
+int console_mode = 0;
 string save_file;
 
+string info_select_s = "------"; // info about select clik
 
 int otris_map = 0;
 
@@ -112,8 +114,14 @@ void crea_setka()
 
 		}
 	}
+	for (int i = 0; i < map_y; i++)
+	{
+		info_map_script[i].resize(map_x);
+	}
 }
-
+/// <summary>
+/// ////////////////////////// SAVE MAP
+/// </summary>
 void save_fun()
 {
 	ofstream save_fu(save_file+".txt");
@@ -146,6 +154,14 @@ void save_fun()
 
 		save_fu << names_script_map[i] << endl;
 	}
+
+	for (int y = 0; y < map_y; y++)
+	{
+		for (int i = 0; i < map_x; i++)
+		{
+			save_fu << info_map_script[y][i] << endl;
+		}
+	}
 	save_fu.close();
 
 }
@@ -155,47 +171,19 @@ void save_fun()
 
 void map_to_script()
 {
-	for (int i = 0; i < 32; i++)
-	{
-		for (int a = 0; a < 32; a++)
-		{
-			//if (map_vid[i][a] != map_script[i][a])
-			//{
-				//if (names_st_map[(int)map_vid[i][a]-48] == names_script_map[(int)map_script[i][a]-48])
-			//	{
-				//	cout << names_st_map[(int)map_vid[i][a] - 48] << endl;
-				//	map_script[i][a] = map_vid[i][a];
-			//	}
-		//	}
-
-		}
-	}
-
-
 }
 
 
 void set_size_map()
 {
-	map_vid.resize(map_z, vector<string>(map_y));
-
+	for (int i = 0; i < map_z; i++)
+	{
+		map_vid[i].resize(map_y);
+	}
 	map_script.resize(map_y);
+	info_map_script.resize(map_y);
 
-//	string lol = string(map_x, '0');
-	//for (int a = 0; a < 9; a++)
-	//{
-	//	for (int i = 0; i < map_y; i++)
-	//	{
-
-		//	map_vid[a][i] = lol;
-		//	map_script[i] = lol;
-
-
-	//	}
-//	}
-
-	
-
+//	info_map_script.resize(map_y, vector<string>(map_x));
 	
 }
 
@@ -210,15 +198,24 @@ void load_save()
 	load_file >> map_y;
 	load_file >> map_z;
 
-	map_vid.resize(map_z, vector<string>(map_y));
+	for (int i = 0; i < map_z; i++)
+	{
+		map_vid[i].resize(map_y);
+	}
+	for (int i = 0; i < map_y; i++)
+	{
+		info_map_script[i].resize(map_x);
+	}
+	//map_vid.resize(map_z, vector<string>(map_y));
 	map_script.resize(map_y);
+	//info_map_script.resize(map_y, vector<string>(map_x));
+
 
 	for (int a = 0; a < map_z; a++)
 	{
 		for (int i = 0; i < map_y; i++)
 		{
 			load_file >> map_vid[a][i];
-			//cout << map_vid[a][i] << endl;
 		}
 
 		for (int i = 0; i < 10; i++)
@@ -238,6 +235,16 @@ void load_save()
 
 		load_file >> names_script_map[i];
 	}
+
+
+	for (int y = 0; y < map_y; y++)
+	{
+		for (int i = 0; i < map_x; i++)
+		{
+			load_file >> info_map_script[y][i];
+		}
+	}
+
 	load_file.close();
 }
 
@@ -279,8 +286,12 @@ int main()
 		{
 			names_st_map[a][i] = path_res + "clear" + ".png";
 			names_script_map[i] = path_res + "clear" + ".png";
+			
 		}
 	}
+
+
+
 
 	Vector2i mouse_pos = Mouse::getPosition(window);
 
@@ -297,7 +308,7 @@ int main()
 	console_von.position(win_x - 600, 0);
 
 	Texturs save_von("red_tt");
-	save_von.position(win_x - 130, 70);
+	save_von.position(win_x - 200, 70);
 
 	Texturs load_von("load");
 	load_von.position(win_x - 130, 126);
@@ -319,7 +330,11 @@ int main()
 	Texturs set_x("set_x");
 	set_x.position(win_x - 520, 73);
 
+	Texturs mode_set_name("mode_set_name");
+	mode_set_name.position(win_x - 520, 120);
 
+	Texturs info_select("info_select");
+	info_select.position(win_x - 400, 120);
 
 	//////////////////////////////// poka open window
 	while (window.isOpen())
@@ -367,23 +382,34 @@ int main()
 					mouse_y_c++;
 				}
 
-
+				///////////////click on map
 				string simvol_map = to_string(win_mode - 2);
-				if (mode_map ==0)
+				if (mode_map ==0 && console_mode == 0)
 				{
 				
 				map_vid[map_num][mouse_y_c - 1 + scrol_y_mas][mouse_x_c - 1 + scrol_x_mas]        = simvol_map[0];
 				}
-				if (mode_map == 1)
+				if (mode_map == 1 && console_mode == 1)
 				{
 
-				//	map_script[mouse_x_c - 1 + (16 * (scrol_x - 1))][mouse_y_c - 1 + (16 * (scrol_y - 1))] = simvol_map[0];
+					map_script[mouse_y_c - 1 + scrol_y_mas][mouse_x_c - 1 + scrol_x_mas] = simvol_map[0];
+
+				
+					info_map_script[mouse_y_c - 1 + scrol_y_mas][mouse_x_c - 1 + scrol_x_mas] = save_file + "+" + to_string(mouse_y_c - 1 + scrol_y_mas) + "+" + to_string(mouse_x_c - 1 + scrol_x_mas);
+					
 				}
-				//cout << mouse_x_c - 1 <<" "<< mouse_y_c - 1 << " "<< map_vid[mouse_x_c - 1][mouse_y_c - 1] << endl;
 
-				//cout << mouse_y_c << " " << mouse_x_c << " " << mouse_pos.x << endl;
+				if (console_mode == 2)
+				{
+					info_select_s = "-------";
+					if (info_map_script[mouse_y_c - 1 + scrol_y_mas][mouse_x_c - 1 + scrol_x_mas] != '4')
+					{
+						info_select_s += "\n"+ info_map_script[mouse_y_c - 1 + scrol_y_mas][mouse_x_c - 1 + scrol_x_mas];
+					}
+
+				}
 			}
-
+			////////////////////move map
 			if (event.type == Event::KeyPressed)
 			{
 				if (Keyboard::isKeyPressed(Keyboard::Up) && scrol_y>1 )
@@ -422,7 +448,7 @@ int main()
 
 
 
-		//active text path
+		//////active text path
 		if (Mouse::isButtonPressed(Mouse::Left) && (mouse_x > save_von.x && mouse_x < save_von.x + 130) && (mouse_y > save_von.y && mouse_y < save_von.y + 46))
 		{
 			win_mode = 1;
@@ -482,6 +508,7 @@ int main()
 		}
 
 
+		////////// info about size map/////////////////////////////
 
 
 		if (Mouse::isButtonPressed(Mouse::Left) && (mouse_x >set_x.x && mouse_x < set_x.x + 114) && (mouse_y > set_x.y && mouse_y < set_x.y + 24))
@@ -499,13 +526,48 @@ int main()
 			log_info = "set y";
 			map_y = stoi(save_file);
 			set_size_map();
+			crea_setka();
+			
 
+		}
+
+		if (Mouse::isButtonPressed(Mouse::Left) && (mouse_x > mode_set_name.x && mouse_x < mode_set_name.x + 114) && (mouse_y > mode_set_name.y && mouse_y < mode_set_name.y + 25))
+		{
+
+			if (console_mode != 0)
+			{
+				log_info = "No active set name";
+				console_mode = 0;
+				Sleep(30);
+			}
+		}
+		if (Mouse::isButtonPressed(Mouse::Left) && (mouse_x > mode_set_name.x && mouse_x < mode_set_name.x + 114) && (mouse_y > mode_set_name.y && mouse_y < mode_set_name.y + 25))
+		{
+			if (console_mode != 1)
+			{
+				log_info = "Active set name";
+				console_mode =1;
+				Sleep(30);
+			}
+		}
+
+
+
+		if (Mouse::isButtonPressed(Mouse::Left) && (mouse_x > info_select.x && mouse_x < info_select.x + 114) && (mouse_y > info_select.y && mouse_y < info_select.y + 25))
+		{
+			if (console_mode != 2)
+			{
+				log_info = "On chek info select";
+				console_mode = 2;
+				Sleep(30);
+			}
 		}
 
 
 
 
 
+	//////////it's vibor map setki
 
 		if (win_mode != 1)
 		{
@@ -579,7 +641,8 @@ int main()
 		window.draw(script_load.sprite);
 		window.draw(set_y.sprite);
 		window.draw(set_x.sprite);
-
+		window.draw(mode_set_name.sprite);
+		window.draw(info_select.sprite);
 
 		for (int i = 0; i < 10; i++)
 		{
@@ -651,6 +714,10 @@ int main()
 
 		otris_map = 1;
 
+
+		
+
+
 		/// <summary>
 		/// ///////////////////////////////////////////////////////////
 		/// </summary>
@@ -681,9 +748,14 @@ int main()
 		text.setString("Map mode:"+to_string(mode_map));
 		window.draw(text);
 
-
-		text.setPosition(win_x - 120, 83);
+		///////text in console
+		text.setPosition(win_x - 185, 83);
 		text.setString(save_file);
+		window.draw(text);
+
+		//this print info about select
+		text.setPosition(win_x - 500, 250);
+		text.setString(info_select_s);
 		window.draw(text);
 
 
